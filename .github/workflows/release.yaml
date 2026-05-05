@@ -1,0 +1,54 @@
+name: Build and Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+      - "v*-beta*"
+      - "v*-alpha*"
+      - "v*-rc*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      # Strip the leading "v" from the tag for the NuGet package version.
+      - name: Extract version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Restore dependencies
+        run: dotnet restore Source/Porticle.Enumly.slnx
+
+      - name: Build solution
+        run: dotnet build Source/Porticle.Enumly.slnx --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test Source/Porticle.Enumly.UnitTests/Porticle.Enumly.UnitTests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Pack NuGet package
+        run: dotnet pack Source/Porticle.Enumly/Porticle.Enumly.csproj --configuration Release --no-build --output ./nuget --property:PackageVersion=${{ env.VERSION }}
+
+      - name: Publish NuGet package
+        run: dotnet nuget push ./nuget/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }}
+          body: "Nuget Release für Porticle.Enumly v${{ env.VERSION }}."
+          files: ./nuget/*.nupkg
+          draft: false
+          prerelease: ${{ contains(env.VERSION, '-beta') || contains(env.VERSION, '-alpha') || contains(env.VERSION, '-rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

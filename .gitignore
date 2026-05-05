@@ -1,0 +1,39 @@
+# Build output
+bin/
+obj/
+
+# Source-generator output (when EmitCompilerGeneratedFiles is on)
+generated/
+
+# IDE / editor
+.vs/
+.idea/
+.vscode/
+.claude/
+*.user
+*.suo
+*.userprefs
+
+# Rider / ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# Test / coverage
+TestResults/
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+*.opencover.xml
+
+# NuGet
+*.nupkg
+*.snupkg
+nuget/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log

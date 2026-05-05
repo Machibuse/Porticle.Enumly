@@ -1,0 +1,4 @@
+<Solution>
+    <Project Path="Porticle.Enumly/Porticle.Enumly.csproj"/>
+    <Project Path="Porticle.Enumly.UnitTests/Porticle.Enumly.UnitTests.csproj"/>
+</Solution>
