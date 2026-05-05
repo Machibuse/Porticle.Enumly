@@ -21,6 +21,7 @@
         <RepositoryType>git</RepositoryType>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>pinky32.png</PackageIcon>
         <DevelopmentDependency>true</DevelopmentDependency>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     </PropertyGroup>
@@ -33,6 +34,7 @@
     <ItemGroup>
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
         <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+        <None Include="pinky32.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
 </Project>
