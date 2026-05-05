@@ -33,6 +33,12 @@ public static partial class Mapper
     [EnumlyMapValue(Bar.BarRoyalBlue, Noo.GooRoyal)]
     public static partial Noo ToNoo(Bar? value);
 
+    /// <summary>
+    ///     Case B: Bar? → Noo  (nullable source, non-nullable target)
+    /// </summary>
+    [EnumlyMap(NullTargetValue = Bar.BarRed)]
+    public static partial Bar ToBar(Bar? value);
+    
 
     /// <summary>
     ///     Case C: Bar? → Foo?  (nullable → nullable, null → null automatisch)

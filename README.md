@@ -85,7 +85,9 @@ public static partial Foo? ToFoo(Bar? value);   // T? -> U? (null -> null)
 - `NullSourceValue` is a value of the **source** enum that should map to `null` on
   the target side. Only meaningful when the target is nullable.
 - `NullTargetValue` is a value of the **target** enum that is produced when the
-  source is `null`. Only meaningful when the source is nullable.
+  source is `null`. **Required** when the source is nullable and the target is
+  non-nullable (otherwise `EM0010`, error) — null input must have a defined
+  target. Optional in all other cases.
 - For `T? -> U?`, `null -> null` happens automatically. `NullSourceValue` and
   `NullTargetValue` can still be used for additional mappings.
 
@@ -145,6 +147,7 @@ verified at compile time (otherwise `EM0009`, error).
 | EM0007 | Error    | The same source value is mapped explicitly more than once.                                                                                                                            |
 | EM0008 | Warning  | Target enum value is not reachable from any source. Suppressible per-value with `[EnumlyIgnoreTarget]`, or globally via `.editorconfig` (`dotnet_diagnostic.EM0008.severity = none`). |
 | EM0009 | Error    | An `EnumlyIgnoreSource` / `EnumlyIgnoreTarget` argument has the wrong enum type.                                                                                                      |
+| EM0010 | Error    | Source is nullable and target is non-nullable, but `NullTargetValue` is not set — null input has no defined target.                                                                   |
 
 `NullTargetValue` on a non-nullable source is allowed and ignored — no diagnostic.
 

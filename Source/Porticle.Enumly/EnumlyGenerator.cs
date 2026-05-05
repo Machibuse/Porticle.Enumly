@@ -107,6 +107,10 @@ namespace Porticle.Enumly
         private static readonly DiagnosticDescriptor IgnoreValueWrongType = new("EM0009", "Ignore-value attribute has wrong enum type",
             "Method '{0}': [{1}] expects a value of enum '{2}' but got a value of type '{3}'. Use a member of '{2}'.", "Enumly", DiagnosticSeverity.Error, true);
 
+        private static readonly DiagnosticDescriptor MissingNullTargetValue = new("EM0010", "Nullable source requires NullTargetValue when target is non-nullable",
+            "Method '{0}': source is a nullable enum '{1}' but target is non-nullable '{2}'. Specify [EnumlyMap(NullTargetValue = ...)] to define the target value for null input, or change the return type to '{2}?'.",
+            "Enumly", DiagnosticSeverity.Error, true);
+
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             context.RegisterPostInitializationOutput(static ctx => ctx.AddSource("EnumMapperAttributes.g.cs", SourceText.From(AttributeSource, Encoding.UTF8)));
@@ -447,6 +451,14 @@ namespace Porticle.Enumly
                 if (m is { NullSourceSpecified: true, TargetNullable: false })
                 {
                     spc.ReportDiagnostic(Diagnostic.Create(NullSourceWithNonNullableTarget, m.Location, m.Name));
+                }
+
+                // A nullable source with a non-nullable target requires the user to define
+                // what target value to produce on null input. Without NullTargetValue this
+                // would silently throw at runtime — make it a compile-time error instead.
+                if (m is { SourceNullable: true, TargetNullable: false, NullTargetSpecified: false })
+                {
+                    spc.ReportDiagnostic(Diagnostic.Create(MissingNullTargetValue, m.Location, m.Name, m.SourceDisplay, m.TargetDisplay));
                 }
 
                 // Type checks: if a null-value was specified, its enum type must match the
