@@ -14,4 +14,5 @@ EM0006  | Enumly   | Error    | EnumlyMapValue argument has wrong enum type
 EM0007  | Enumly   | Error    | Duplicate explicit mapping for source value
 EM0008  | Enumly   | Warning  | Target enum value is not reachable from any source
 EM0009  | Enumly   | Error    | EnumlyIgnoreSource/EnumlyIgnoreTarget argument has wrong enum type
-EM0010  | Enumly   | Error    | Nullable source requires NullTargetValue when target is non-nullable
+EM0010  | Enumly   | Error    | Nullable source requires NullTargetValue or IgnoreNullSource when target is non-nullable
+EM0011  | Enumly   | Error    | NullTargetValue and IgnoreNullSource are mutually exclusive

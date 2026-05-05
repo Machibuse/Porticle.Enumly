@@ -119,4 +119,22 @@ public class EnumMappingTests
         // for the reachable values must continue to work.
         Assert.Equal(expected, Mapper.ToFooPlus(input));
     }
+
+    [Theory]
+    [InlineData(Bar.BarRed,        Bar.BarRed)]
+    [InlineData(Bar.BarRose,       Bar.BarRose)]
+    [InlineData(Bar.BarRoyalBlue,  Bar.BarRoyalBlue)]
+    public void ToBarStrict_maps_non_null_input(Bar input, Bar expected)
+    {
+        Assert.Equal(expected, Mapper.ToBarStrict(input));
+    }
+
+    [Fact]
+    public void ToBarStrict_throws_ArgumentNullException_for_null_input()
+    {
+        // IgnoreNullSource = true → null input throws with a dedicated message
+        // identifying it as excluded by IgnoreNullSource.
+        var ex = Assert.Throws<ArgumentNullException>(() => Mapper.ToBarStrict(null));
+        Assert.Contains("IgnoreNullSource", ex.Message);
+    }
 }

@@ -75,4 +75,13 @@ public static partial class Mapper
     [EnumlyIgnoreTarget(FooPlus.GoldExtra1)]
     [EnumlyIgnoreTarget(FooPlus.GoldExtra2)]
     public static partial FooPlus ToFooPlus(Bar value);
+
+    /// <summary>
+    ///     Case G: Bar? → Bar with IgnoreNullSource = true.
+    ///     The non-nullable target has no NullTargetValue; a null input throws
+    ///     ArgumentNullException at runtime with a dedicated "excluded by IgnoreNullSource" message.
+    ///     Without IgnoreNullSource (and without NullTargetValue) this would fire EM0010.
+    /// </summary>
+    [EnumlyMap(IgnoreNullSource = true)]
+    public static partial Bar ToBarStrict(Bar? value);
 }

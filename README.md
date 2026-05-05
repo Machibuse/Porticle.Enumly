@@ -85,11 +85,22 @@ public static partial Foo? ToFoo(Bar? value);   // T? -> U? (null -> null)
 - `NullSourceValue` is a value of the **source** enum that should map to `null` on
   the target side. Only meaningful when the target is nullable.
 - `NullTargetValue` is a value of the **target** enum that is produced when the
-  source is `null`. **Required** when the source is nullable and the target is
-  non-nullable (otherwise `EM0010`, error) — null input must have a defined
-  target. Optional in all other cases.
-- For `T? -> U?`, `null -> null` happens automatically. `NullSourceValue` and
-  `NullTargetValue` can still be used for additional mappings.
+  source is `null`.
+- `IgnoreNullSource = true` — when the source is `null`, throw
+  `ArgumentNullException` at runtime instead of producing a target. Use this when
+  you'd rather fail loudly than pick a target value for null.
+- For `T? -> U?`, `null -> null` happens automatically. `NullSourceValue`,
+  `NullTargetValue` and `IgnoreNullSource` can still be used to override that.
+
+When the source is nullable and the target is non-nullable, exactly one of
+`NullTargetValue` or `IgnoreNullSource` must be set (otherwise `EM0010`, error) —
+null input must have a defined behavior. Setting both is a contradiction and
+fails with `EM0011`.
+
+```csharp
+[EnumlyMap(IgnoreNullSource = true)]
+public static partial Foo ToFoo(Bar? value);   // T? -> U  (null -> throw)
+```
 
 ### Explicit value overrides
 
@@ -147,9 +158,10 @@ verified at compile time (otherwise `EM0009`, error).
 | EM0007 | Error    | The same source value is mapped explicitly more than once.                                                                                                                            |
 | EM0008 | Warning  | Target enum value is not reachable from any source. Suppressible per-value with `[EnumlyIgnoreTarget]`, or globally via `.editorconfig` (`dotnet_diagnostic.EM0008.severity = none`). |
 | EM0009 | Error    | An `EnumlyIgnoreSource` / `EnumlyIgnoreTarget` argument has the wrong enum type.                                                                                                      |
-| EM0010 | Error    | Source is nullable and target is non-nullable, but `NullTargetValue` is not set — null input has no defined target.                                                                   |
+| EM0010 | Error    | Source is nullable and target is non-nullable, but neither `NullTargetValue` nor `IgnoreNullSource = true` is set — null input has no defined behavior.                              |
+| EM0011 | Error    | `NullTargetValue` and `IgnoreNullSource` are both set — they describe conflicting behavior for null input.                                                                            |
 
-`NullTargetValue` on a non-nullable source is allowed and ignored — no diagnostic.
+`NullTargetValue` and `IgnoreNullSource` on a non-nullable source are allowed and ignored — no diagnostic.
 
 ## Example: full mapper class
 

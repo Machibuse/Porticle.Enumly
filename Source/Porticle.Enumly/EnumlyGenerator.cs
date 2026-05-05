@@ -39,6 +39,14 @@ namespace Porticle.Enumly
         /// Only meaningful when the source parameter type is a nullable enum.
         /// </summary>
         public object? NullTargetValue { get; set; }
+
+        /// <summary>
+        /// When <c>true</c>, a <c>null</c> source value throws
+        /// <see cref=""global::System.ArgumentNullException""/> at runtime instead of
+        /// producing a target. Only meaningful when the source parameter type is a
+        /// nullable enum. Mutually exclusive with <see cref=""NullTargetValue""/>.
+        /// </summary>
+        public bool IgnoreNullSource { get; set; }
     }
 
     /// <summary>
@@ -107,8 +115,12 @@ namespace Porticle.Enumly
         private static readonly DiagnosticDescriptor IgnoreValueWrongType = new("EM0009", "Ignore-value attribute has wrong enum type",
             "Method '{0}': [{1}] expects a value of enum '{2}' but got a value of type '{3}'. Use a member of '{2}'.", "Enumly", DiagnosticSeverity.Error, true);
 
-        private static readonly DiagnosticDescriptor MissingNullTargetValue = new("EM0010", "Nullable source requires NullTargetValue when target is non-nullable",
-            "Method '{0}': source is a nullable enum '{1}' but target is non-nullable '{2}'. Specify [EnumlyMap(NullTargetValue = ...)] to define the target value for null input, or change the return type to '{2}?'.",
+        private static readonly DiagnosticDescriptor MissingNullTargetValue = new("EM0010", "Nullable source requires a defined null behavior when target is non-nullable",
+            "Method '{0}': source is a nullable enum '{1}' but target is non-nullable '{2}'. Specify [EnumlyMap(NullTargetValue = ...)] to define the target value for null input, set IgnoreNullSource = true to throw on null, or change the return type to '{2}?'.",
+            "Enumly", DiagnosticSeverity.Error, true);
+
+        private static readonly DiagnosticDescriptor ConflictingNullBehavior = new("EM0011", "NullTargetValue and IgnoreNullSource are mutually exclusive",
+            "Method '{0}': NullTargetValue and IgnoreNullSource are both set. They define conflicting behavior for null input — keep only one.",
             "Enumly", DiagnosticSeverity.Error, true);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -183,6 +195,7 @@ namespace Porticle.Enumly
                 // (e.g. NullSourceValue = Bar.X when the source enum is actually Noo).
                 var nullSourceRaw = TryGetNamedArg(mapEnumAttr, "NullSourceValue");
                 var nullTargetRaw = TryGetNamedArg(mapEnumAttr, "NullTargetValue");
+                var ignoreNullSource = TryGetNamedBoolArg(mapEnumAttr, "IgnoreNullSource");
 
                 var nullSourceTypeMatches = !nullSourceRaw.Specified || (nullSourceRaw.Type is not null && SymbolEqualityComparer.Default.Equals(nullSourceRaw.Type, srcEnum));
                 var nullTargetTypeMatches = !nullTargetRaw.Specified || (nullTargetRaw.Type is not null && SymbolEqualityComparer.Default.Equals(nullTargetRaw.Type, tgtEnum));
@@ -286,7 +299,7 @@ namespace Porticle.Enumly
                 methods.Add(new MethodInfo(m.Name, m.IsStatic, AccessibilityString(m.DeclaredAccessibility), m.Parameters[0].Name, srcEnumFqn, tgtEnumFqn, srcEnumFqn + (srcNullable ? "?" : string.Empty),
                     tgtEnumFqn + (tgtNullable ? "?" : string.Empty), srcEnum.ToDisplayString(), tgtEnum.ToDisplayString(), srcNullable, tgtNullable, nullSourceMember, nullTargetMember, nullSourceRaw.Specified, nullTargetRaw.Specified,
                     nullSourceTypeMatches, nullTargetTypeMatches, nullSourceProvidedType, nullTargetProvidedType, nullSourceRaw.Value?.ToString() ?? string.Empty, nullTargetRaw.Value?.ToString() ?? string.Empty, srcMembers, tgtMembers,
-                    explicitMappings, ignoreSource, ignoreTarget, location, false));
+                    explicitMappings, ignoreSource, ignoreTarget, ignoreNullSource, location, false));
             }
 
             if (methods.Count == 0)
@@ -383,6 +396,17 @@ namespace Porticle.Enumly
             return new NamedArgInfo(false, null, null);
         }
 
+        private static bool TryGetNamedBoolArg(AttributeData attr, string name)
+        {
+            foreach (var pair in attr.NamedArguments)
+            {
+                if (pair.Key != name) continue;
+                if (pair.Value.Value is bool b) return b;
+            }
+
+            return false;
+        }
+
         private static string? ResolveEnumMemberName(long? rawValue, INamedTypeSymbol enumType)
         {
             if (rawValue is null) return null;
@@ -454,11 +478,19 @@ namespace Porticle.Enumly
                 }
 
                 // A nullable source with a non-nullable target requires the user to define
-                // what target value to produce on null input. Without NullTargetValue this
-                // would silently throw at runtime — make it a compile-time error instead.
-                if (m is { SourceNullable: true, TargetNullable: false, NullTargetSpecified: false })
+                // what target value to produce on null input. Without NullTargetValue or
+                // IgnoreNullSource this would silently throw at runtime — make it a
+                // compile-time error instead.
+                if (m is { SourceNullable: true, TargetNullable: false, NullTargetSpecified: false, IgnoreNullSource: false })
                 {
                     spc.ReportDiagnostic(Diagnostic.Create(MissingNullTargetValue, m.Location, m.Name, m.SourceDisplay, m.TargetDisplay));
+                }
+
+                // NullTargetValue and IgnoreNullSource describe conflicting behavior for the
+                // null arm — only one may be set.
+                if (m is { NullTargetSpecified: true, IgnoreNullSource: true })
+                {
+                    spc.ReportDiagnostic(Diagnostic.Create(ConflictingNullBehavior, m.Location, m.Name));
                 }
 
                 // Type checks: if a null-value was specified, its enum type must match the
@@ -595,15 +627,22 @@ namespace Porticle.Enumly
                 sb.AppendLine("        {");
 
                 // null-arm: only emit if source is nullable.
+                // Precedence: IgnoreNullSource (throw) > NullTargetValue (mapped value) >
+                // nullable target (null => null) > fallback throw (EM0010 already fired).
                 if (m.SourceNullable)
                 {
-                    if (m.TargetNullable)
+                    if (m.IgnoreNullSource)
                     {
-                        sb.AppendLine("            null => null,");
+                        sb.Append("            null => throw new global::System.ArgumentNullException(nameof(").Append(m.ParamName)
+                            .Append("), \"Method '").Append(m.Name).Append("': null source value was excluded from the mapping by IgnoreNullSource = true.\"),").AppendLine();
                     }
                     else if (m.NullTargetMember is not null)
                     {
                         sb.Append("            null => ").Append(m.TargetEnumFqn).Append('.').Append(m.NullTargetMember).AppendLine(",");
+                    }
+                    else if (m.TargetNullable)
+                    {
+                        sb.AppendLine("            null => null,");
                     }
                     else
                     {
@@ -695,13 +734,14 @@ namespace Porticle.Enumly
             IReadOnlyList<ExplicitMapping> ExplicitMappings,
             IReadOnlyList<IgnoreValue> IgnoreSourceValues,
             IReadOnlyList<IgnoreValue> IgnoreTargetValues,
+            bool IgnoreNullSource,
             Location Location,
             bool Invalid)
         {
             public static MethodInfo CreateInvalid(string name, Location location)
             {
                 return new MethodInfo(name, false, "internal", "value", "", "", "", "", "", "", false, false, null, null, false, false, true, true, "", "", "", "", Array.Empty<EnumMember>(), Array.Empty<EnumMember>(),
-                    Array.Empty<ExplicitMapping>(), Array.Empty<IgnoreValue>(), Array.Empty<IgnoreValue>(), location, true);
+                    Array.Empty<ExplicitMapping>(), Array.Empty<IgnoreValue>(), Array.Empty<IgnoreValue>(), false, location, true);
             }
         }
 
