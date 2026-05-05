@@ -104,17 +104,47 @@ Explicit mappings override by-name matching for the given source value. The
 attribute can be applied multiple times per method. A source value covered by an
 `[EnumlyMapValue]` is exempt from the coverage diagnostic.
 
+### Ignoring unmapped values
+
+By default the generator enforces coverage in **both directions**:
+
+- every **source** value must have a target (otherwise `EM0001`, error)
+- every **target** value must be reachable from some source (otherwise `EM0008`, warning)
+
+When a value is intentionally outside the mapping, opt out per-value:
+
+```csharp
+[EnumlyMap]
+[EnumlyMapValue(Bar.BarRoyalBlue, Foo.GoldRoyal)]
+[EnumlyIgnoreSource(Bar.BarLegacy)]      // suppresses EM0001 for Bar.BarLegacy
+[EnumlyIgnoreTarget(Foo.GoldReserved)]   // suppresses EM0008 for Foo.GoldReserved
+public static partial Foo ToFoo(Bar value);
+```
+
+- `[EnumlyIgnoreSource(value)]` — marks a source value as intentionally unmapped.
+  At runtime, calling the method with that value throws
+  `ArgumentOutOfRangeException` with a message identifying the value as
+  *excluded by `[EnumlyIgnoreSource]`* — distinguishable from a generic
+  unsupported value.
+- `[EnumlyIgnoreTarget(value)]` — marks a target value as intentionally
+  unreachable. Purely a compile-time hint; no runtime effect.
+
+Both attributes can be applied multiple times. The argument's enum type is
+verified at compile time (otherwise `EM0009`, error).
+
 ## Diagnostics
 
 | ID | Severity | Meaning |
 |----|----------|---------|
-| EM0001 | Error | Source enum value has no matching target member (after prefix-strip and explicit overrides) |
-| EM0002 | Error | Method is not partial / has invalid signature (must take one enum and return an enum) |
-| EM0003 | Error | `NullSourceValue` is set but the return type is not nullable |
-| EM0004 | Error | A specified null value is not a member of its enum |
-| EM0005 | Error | A specified null value has the wrong enum type |
-| EM0006 | Error | An `EnumlyMapValue` argument has the wrong enum type |
-| EM0007 | Error | The same source value is mapped explicitly more than once |
+| EM0001 | Error   | Source enum value has no matching target member (after prefix-strip and explicit overrides). Suppressible per-value with `[EnumlyIgnoreSource]`. |
+| EM0002 | Error   | Method is not partial / has invalid signature (must take one enum and return an enum). |
+| EM0003 | Error   | `NullSourceValue` is set but the return type is not nullable. |
+| EM0004 | Error   | A specified null value is not a member of its enum. |
+| EM0005 | Error   | A specified null value has the wrong enum type. |
+| EM0006 | Error   | An `EnumlyMapValue` argument has the wrong enum type. |
+| EM0007 | Error   | The same source value is mapped explicitly more than once. |
+| EM0008 | Warning | Target enum value is not reachable from any source. Suppressible per-value with `[EnumlyIgnoreTarget]`, or globally via `.editorconfig` (`dotnet_diagnostic.EM0008.severity = none`). |
+| EM0009 | Error   | An `EnumlyIgnoreSource` / `EnumlyIgnoreTarget` argument has the wrong enum type. |
 
 `NullTargetValue` on a non-nullable source is allowed and ignored — no diagnostic.
 

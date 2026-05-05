@@ -76,4 +76,47 @@ public class EnumMappingTests
         // NullTargetValue on a non-nullable source is allowed but unused.
         Assert.Equal(expected, Mapper.ToNooX(input));
     }
+
+    [Theory]
+    [InlineData(BarPlus.BarRed,        Foo.GoldRed)]
+    [InlineData(BarPlus.BarRose,       Foo.GoldRose)]
+    [InlineData(BarPlus.BarRoyalBlue,  Foo.GoldRoyal)] // explicit override
+    public void ToFooFromPlus_maps_non_ignored_values(BarPlus input, Foo expected)
+    {
+        Assert.Equal(expected, Mapper.ToFooFromPlus(input));
+    }
+
+    [Fact]
+    public void ToFooFromPlus_throws_for_ignored_source_value()
+    {
+        // BarPlus.BarExtra is marked with [EnumlyIgnoreSource] — calling with it must
+        // throw with the dedicated "excluded by [EnumlyIgnoreSource]" message.
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => Mapper.ToFooFromPlus(BarPlus.BarExtra));
+        Assert.Contains("EnumlyIgnoreSource", ex.Message);
+        Assert.Contains("BarExtra", ex.Message);
+    }
+
+    [Fact]
+    public void ToFooFromPlus_throws_for_unknown_source_value()
+    {
+        // A value cast from outside the declared range still hits the default arm
+        // and reports the generic "is not supported" message — distinguishable from
+        // an explicitly ignored value.
+        var unknown = (BarPlus)999;
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => Mapper.ToFooFromPlus(unknown));
+        Assert.Contains("is not supported", ex.Message);
+        Assert.DoesNotContain("EnumlyIgnoreSource", ex.Message);
+    }
+
+    [Theory]
+    [InlineData(Bar.BarRed,        FooPlus.GoldRed)]
+    [InlineData(Bar.BarRose,       FooPlus.GoldRose)]
+    [InlineData(Bar.BarRoyalBlue,  FooPlus.GoldRoyal)] // explicit override
+    public void ToFooPlus_maps_when_extra_targets_are_ignored(Bar input, FooPlus expected)
+    {
+        // FooPlus has GoldExtra1/GoldExtra2 that aren't reachable from any Bar value.
+        // [EnumlyIgnoreTarget] silences the EM0008 reachability warning. Runtime mapping
+        // for the reachable values must continue to work.
+        Assert.Equal(expected, Mapper.ToFooPlus(input));
+    }
 }

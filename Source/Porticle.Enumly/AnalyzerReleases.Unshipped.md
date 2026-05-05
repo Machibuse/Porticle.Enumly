@@ -12,3 +12,5 @@ EM0004 | EnumMapper | Error | EnumlyGenerator
 EM0005 | EnumMapper | Error | EnumlyGenerator
 EM0006 | EnumMapper | Error | EnumlyGenerator
 EM0007 | EnumMapper | Error | EnumlyGenerator
+EM0008 | EnumMapper | Warning | EnumlyGenerator
+EM0009 | EnumMapper | Error | EnumlyGenerator
