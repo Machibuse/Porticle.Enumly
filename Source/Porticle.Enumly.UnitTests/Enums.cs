@@ -1,17 +1,17 @@
-namespace ConsoleApp3;
+namespace Porticle.Enumly.UnitTests;
 
 public enum Foo
 {
     GoldRed,
     GoldRose,
-    GoldRoyal,
+    GoldRoyal
 }
 
 public enum Bar
 {
     BarRed,
     BarRose,
-    BarRoyalBlue,
+    BarRoyalBlue
 }
 
 public enum Noo
@@ -19,7 +19,7 @@ public enum Noo
     GooNone,
     GooRose,
     GooRed,
-    GooRoyal,
+    GooRoyal
 }
 
 // Source enum with an extra value used to test [EnumlyIgnoreSource].
@@ -29,7 +29,7 @@ public enum BarPlus
     BarRed,
     BarRose,
     BarRoyalBlue,
-    BarExtra,
+    BarExtra
 }
 
 // Target enum with extra values used to test [EnumlyIgnoreTarget].
@@ -41,5 +41,5 @@ public enum FooPlus
     GoldRose,
     GoldRoyal,
     GoldExtra1,
-    GoldExtra2,
+    GoldExtra2
 }

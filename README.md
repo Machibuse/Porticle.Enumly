@@ -134,17 +134,17 @@ verified at compile time (otherwise `EM0009`, error).
 
 ## Diagnostics
 
-| ID | Severity | Meaning |
-|----|----------|---------|
-| EM0001 | Error   | Source enum value has no matching target member (after prefix-strip and explicit overrides). Suppressible per-value with `[EnumlyIgnoreSource]`. |
-| EM0002 | Error   | Method is not partial / has invalid signature (must take one enum and return an enum). |
-| EM0003 | Error   | `NullSourceValue` is set but the return type is not nullable. |
-| EM0004 | Error   | A specified null value is not a member of its enum. |
-| EM0005 | Error   | A specified null value has the wrong enum type. |
-| EM0006 | Error   | An `EnumlyMapValue` argument has the wrong enum type. |
-| EM0007 | Error   | The same source value is mapped explicitly more than once. |
-| EM0008 | Warning | Target enum value is not reachable from any source. Suppressible per-value with `[EnumlyIgnoreTarget]`, or globally via `.editorconfig` (`dotnet_diagnostic.EM0008.severity = none`). |
-| EM0009 | Error   | An `EnumlyIgnoreSource` / `EnumlyIgnoreTarget` argument has the wrong enum type. |
+| ID     | Severity | Meaning                                                                                                                                                                               |
+|--------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EM0001 | Error    | Source enum value has no matching target member (after prefix-strip and explicit overrides). Suppressible per-value with `[EnumlyIgnoreSource]`.                                      |
+| EM0002 | Error    | Method is not partial / has invalid signature (must take one enum and return an enum).                                                                                                |
+| EM0003 | Error    | `NullSourceValue` is set but the return type is not nullable.                                                                                                                         |
+| EM0004 | Error    | A specified null value is not a member of its enum.                                                                                                                                   |
+| EM0005 | Error    | A specified null value has the wrong enum type.                                                                                                                                       |
+| EM0006 | Error    | An `EnumlyMapValue` argument has the wrong enum type.                                                                                                                                 |
+| EM0007 | Error    | The same source value is mapped explicitly more than once.                                                                                                                            |
+| EM0008 | Warning  | Target enum value is not reachable from any source. Suppressible per-value with `[EnumlyIgnoreTarget]`, or globally via `.editorconfig` (`dotnet_diagnostic.EM0008.severity = none`). |
+| EM0009 | Error    | An `EnumlyIgnoreSource` / `EnumlyIgnoreTarget` argument has the wrong enum type.                                                                                                      |
 
 `NullTargetValue` on a non-nullable source is allowed and ignored — no diagnostic.
 

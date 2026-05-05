@@ -1,30 +1,30 @@
 using Xunit;
 
-namespace ConsoleApp3;
+namespace Porticle.Enumly.UnitTests;
 
 public class EnumMappingTests
 {
     [Theory]
-    [InlineData(Bar.BarRed,        Foo.GoldRed)]
-    [InlineData(Bar.BarRose,       Foo.GoldRose)]
-    [InlineData(Bar.BarRoyalBlue,  Foo.GoldRoyal)] // explicit override
+    [InlineData(Bar.BarRed, Foo.GoldRed)]
+    [InlineData(Bar.BarRose, Foo.GoldRose)]
+    [InlineData(Bar.BarRoyalBlue, Foo.GoldRoyal)] // explicit override
     public void ToFoo_maps_by_name_and_explicit_overrides(Bar input, Foo expected)
     {
         Assert.Equal(expected, Mapper.ToFoo(input));
     }
 
     [Theory]
-    [InlineData(Foo.GoldRed,    Bar.BarRed)]
-    [InlineData(Foo.GoldRose,   Bar.BarRose)]
-    [InlineData(Foo.GoldRoyal,  Bar.BarRoyalBlue)] // explicit override
+    [InlineData(Foo.GoldRed, Bar.BarRed)]
+    [InlineData(Foo.GoldRose, Bar.BarRose)]
+    [InlineData(Foo.GoldRoyal, Bar.BarRoyalBlue)] // explicit override
     public void ToBar_maps_by_name_and_explicit_overrides(Foo input, Bar expected)
     {
         Assert.Equal(expected, Mapper.ToBar(input));
     }
 
     [Theory]
-    [InlineData(Noo.GooRose,  Bar.BarRose)]
-    [InlineData(Noo.GooRed,   Bar.BarRed)]
+    [InlineData(Noo.GooRose, Bar.BarRose)]
+    [InlineData(Noo.GooRed, Bar.BarRed)]
     [InlineData(Noo.GooRoyal, Bar.BarRoyalBlue)] // explicit override
     public void ToNullableBar_maps_non_null_values(Noo input, Bar expected)
     {
@@ -38,9 +38,9 @@ public class EnumMappingTests
     }
 
     [Theory]
-    [InlineData(Bar.BarRed,        Noo.GooRed)]
-    [InlineData(Bar.BarRose,       Noo.GooRose)]
-    [InlineData(Bar.BarRoyalBlue,  Noo.GooRoyal)] // explicit override
+    [InlineData(Bar.BarRed, Noo.GooRed)]
+    [InlineData(Bar.BarRose, Noo.GooRose)]
+    [InlineData(Bar.BarRoyalBlue, Noo.GooRoyal)] // explicit override
     public void ToNoo_maps_non_null_input(Bar input, Noo expected)
     {
         Assert.Equal(expected, Mapper.ToNoo(input));
@@ -53,9 +53,9 @@ public class EnumMappingTests
     }
 
     [Theory]
-    [InlineData(Bar.BarRed,        Foo.GoldRed)]
-    [InlineData(Bar.BarRose,       Foo.GoldRose)]
-    [InlineData(Bar.BarRoyalBlue,  Foo.GoldRoyal)] // explicit override
+    [InlineData(Bar.BarRed, Foo.GoldRed)]
+    [InlineData(Bar.BarRose, Foo.GoldRose)]
+    [InlineData(Bar.BarRoyalBlue, Foo.GoldRoyal)] // explicit override
     public void ToNullFoo_maps_non_null_input(Bar input, Foo expected)
     {
         Assert.Equal(expected, Mapper.ToNullFoo(input));
@@ -68,9 +68,9 @@ public class EnumMappingTests
     }
 
     [Theory]
-    [InlineData(Bar.BarRed,        Noo.GooRed)]
-    [InlineData(Bar.BarRose,       Noo.GooRose)]
-    [InlineData(Bar.BarRoyalBlue,  Noo.GooRoyal)] // explicit override
+    [InlineData(Bar.BarRed, Noo.GooRed)]
+    [InlineData(Bar.BarRose, Noo.GooRose)]
+    [InlineData(Bar.BarRoyalBlue, Noo.GooRoyal)] // explicit override
     public void ToNooX_maps_non_nullable_source(Bar input, Noo expected)
     {
         // NullTargetValue on a non-nullable source is allowed but unused.
@@ -78,9 +78,9 @@ public class EnumMappingTests
     }
 
     [Theory]
-    [InlineData(BarPlus.BarRed,        Foo.GoldRed)]
-    [InlineData(BarPlus.BarRose,       Foo.GoldRose)]
-    [InlineData(BarPlus.BarRoyalBlue,  Foo.GoldRoyal)] // explicit override
+    [InlineData(BarPlus.BarRed, Foo.GoldRed)]
+    [InlineData(BarPlus.BarRose, Foo.GoldRose)]
+    [InlineData(BarPlus.BarRoyalBlue, Foo.GoldRoyal)] // explicit override
     public void ToFooFromPlus_maps_non_ignored_values(BarPlus input, Foo expected)
     {
         Assert.Equal(expected, Mapper.ToFooFromPlus(input));
@@ -109,9 +109,9 @@ public class EnumMappingTests
     }
 
     [Theory]
-    [InlineData(Bar.BarRed,        FooPlus.GoldRed)]
-    [InlineData(Bar.BarRose,       FooPlus.GoldRose)]
-    [InlineData(Bar.BarRoyalBlue,  FooPlus.GoldRoyal)] // explicit override
+    [InlineData(Bar.BarRed, FooPlus.GoldRed)]
+    [InlineData(Bar.BarRose, FooPlus.GoldRose)]
+    [InlineData(Bar.BarRoyalBlue, FooPlus.GoldRoyal)] // explicit override
     public void ToFooPlus_maps_when_extra_targets_are_ignored(Bar input, FooPlus expected)
     {
         // FooPlus has GoldExtra1/GoldExtra2 that aren't reachable from any Bar value.

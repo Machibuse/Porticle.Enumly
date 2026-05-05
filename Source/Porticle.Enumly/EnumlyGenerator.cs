@@ -9,7 +9,6 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Porticle.Enumly
 {
-
     [Generator]
     public sealed class EnumlyGenerator : IIncrementalGenerator
     {
@@ -78,53 +77,41 @@ namespace Porticle.Enumly
 }
 ";
 
-        private static readonly DiagnosticDescriptor MissingTargetMember = new(id: "EM0001", title: "Source enum value has no matching target member",
-            messageFormat:
+        private static readonly DiagnosticDescriptor MissingTargetMember = new("EM0001", "Source enum value has no matching target member",
             "Enum mapping '{0}' -> '{1}': source value '{2}' has no member with the same name in the target enum. Add [EnumlyMapValue({2}, <target>)] to map it explicitly, or [EnumlyIgnoreSource({2})] to exclude it from the mapping.",
-            category: "EnumMapper", defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+            "EnumMapper", DiagnosticSeverity.Error, true);
 
-        private static readonly DiagnosticDescriptor InvalidSignature = new(id: "EM0002", title: "Invalid enum mapping method signature",
-            messageFormat:
-            "Method '{0}' must be a partial method that takes exactly one (nullable) enum parameter and returns a (nullable) enum type. Example: public static partial TargetEnum Map(SourceEnum value).",
-            category: "EnumMapper", defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+        private static readonly DiagnosticDescriptor InvalidSignature = new("EM0002", "Invalid enum mapping method signature",
+            "Method '{0}' must be a partial method that takes exactly one (nullable) enum parameter and returns a (nullable) enum type. Example: public static partial TargetEnum Map(SourceEnum value).", "EnumMapper",
+            DiagnosticSeverity.Error, true);
 
-        private static readonly DiagnosticDescriptor NullSourceWithNonNullableTarget = new(id: "EM0003", title: "NullSourceValue requires a nullable target",
-            messageFormat:
-            "Method '{0}' specifies NullSourceValue but the return type is not a nullable enum. Either change the return type to '<TargetEnum>?' or remove NullSourceValue.",
-            category: "EnumMapper", defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+        private static readonly DiagnosticDescriptor NullSourceWithNonNullableTarget = new("EM0003", "NullSourceValue requires a nullable target",
+            "Method '{0}' specifies NullSourceValue but the return type is not a nullable enum. Either change the return type to '<TargetEnum>?' or remove NullSourceValue.", "EnumMapper", DiagnosticSeverity.Error, true);
 
-        private static readonly DiagnosticDescriptor InvalidNullValue = new(id: "EM0004", title: "Invalid null value",
-            messageFormat: "Method '{0}': value '{1}' is not a member of enum '{2}'. Use a declared member of '{2}'.", category: "EnumMapper",
-            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+        private static readonly DiagnosticDescriptor InvalidNullValue = new("EM0004", "Invalid null value", "Method '{0}': value '{1}' is not a member of enum '{2}'. Use a declared member of '{2}'.", "EnumMapper", DiagnosticSeverity.Error,
+            true);
 
-        private static readonly DiagnosticDescriptor NullValueWrongType = new(id: "EM0005", title: "Null value has wrong type",
-            messageFormat: "Method '{0}': {1} expects a value of enum '{2}' but got a value of type '{3}'. Use a member of '{2}'.", category: "EnumMapper",
-            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+        private static readonly DiagnosticDescriptor NullValueWrongType = new("EM0005", "Null value has wrong type", "Method '{0}': {1} expects a value of enum '{2}' but got a value of type '{3}'. Use a member of '{2}'.", "EnumMapper",
+            DiagnosticSeverity.Error, true);
 
-        private static readonly DiagnosticDescriptor ExplicitMappingWrongType = new(id: "EM0006", title: "Explicit mapping argument has wrong enum type",
-            messageFormat: "Method '{0}': EnumlyMapValue {1} expects a value of enum '{2}' but got a value of type '{3}'. The first argument must be a source-enum member, the second a target-enum member.",
-            category: "EnumMapper", defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+        private static readonly DiagnosticDescriptor ExplicitMappingWrongType = new("EM0006", "Explicit mapping argument has wrong enum type",
+            "Method '{0}': EnumlyMapValue {1} expects a value of enum '{2}' but got a value of type '{3}'. The first argument must be a source-enum member, the second a target-enum member.", "EnumMapper", DiagnosticSeverity.Error, true);
 
-        private static readonly DiagnosticDescriptor DuplicateExplicitMapping = new(id: "EM0007", title: "Duplicate explicit mapping for source value",
-            messageFormat: "Method '{0}': source value '{1}' is mapped explicitly more than once. Remove the duplicate [EnumlyMapValue({1}, ...)] attribute.",
-            category: "EnumMapper", defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+        private static readonly DiagnosticDescriptor DuplicateExplicitMapping = new("EM0007", "Duplicate explicit mapping for source value",
+            "Method '{0}': source value '{1}' is mapped explicitly more than once. Remove the duplicate [EnumlyMapValue({1}, ...)] attribute.", "EnumMapper", DiagnosticSeverity.Error, true);
 
-        private static readonly DiagnosticDescriptor UnreachableTargetMember = new(id: "EM0008", title: "Target enum value is not reachable from any source value",
-            messageFormat:
+        private static readonly DiagnosticDescriptor UnreachableTargetMember = new("EM0008", "Target enum value is not reachable from any source value",
             "Enum mapping '{0}' -> '{1}': target value '{2}' is not produced by any source value mapping. Add a source value that maps to '{2}' (by name, via [EnumlyMapValue], or via NullTargetValue), or add [EnumlyIgnoreTarget({2})] to mark it as intentionally unreachable.",
-            category: "EnumMapper", defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true);
+            "EnumMapper", DiagnosticSeverity.Warning, true);
 
-        private static readonly DiagnosticDescriptor IgnoreValueWrongType = new(id: "EM0009", title: "Ignore-value attribute has wrong enum type",
-            messageFormat: "Method '{0}': [{1}] expects a value of enum '{2}' but got a value of type '{3}'. Use a member of '{2}'.", category: "EnumMapper",
-            defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
+        private static readonly DiagnosticDescriptor IgnoreValueWrongType = new("EM0009", "Ignore-value attribute has wrong enum type",
+            "Method '{0}': [{1}] expects a value of enum '{2}' but got a value of type '{3}'. Use a member of '{2}'.", "EnumMapper", DiagnosticSeverity.Error, true);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             context.RegisterPostInitializationOutput(static ctx => ctx.AddSource("EnumMapperAttributes.g.cs", SourceText.From(AttributeSource, Encoding.UTF8)));
 
-            var classes = context.SyntaxProvider
-                .ForAttributeWithMetadataName(EnumlyClassAttributeFqn, predicate: static (node, _) => node is ClassDeclarationSyntax,
-                    transform: static (ctx, ct) => ExtractClass(ctx, ct)).Where(static info => info is not null);
+            var classes = context.SyntaxProvider.ForAttributeWithMetadataName(EnumlyClassAttributeFqn, static (node, _) => node is ClassDeclarationSyntax, static (ctx, ct) => ExtractClass(ctx, ct)).Where(static info => info is not null);
 
             context.RegisterSourceOutput(classes, static (spc, info) => Emit(spc, info!));
         }
@@ -134,7 +121,9 @@ namespace Porticle.Enumly
             ct.ThrowIfCancellationRequested();
 
             if (ctx.TargetSymbol is not INamedTypeSymbol cls)
+            {
                 return null;
+            }
 
             var methods = new List<MethodInfo>();
 
@@ -143,11 +132,15 @@ namespace Porticle.Enumly
                 ct.ThrowIfCancellationRequested();
 
                 if (member is not IMethodSymbol m)
+                {
                     continue;
+                }
 
                 var mapEnumAttr = m.GetAttributes().FirstOrDefault(a => a.AttributeClass?.ToDisplayString() == EnumlyMapAttributeFqn);
                 if (mapEnumAttr is null)
+                {
                     continue;
+                }
 
                 var location = m.Locations.FirstOrDefault() ?? Location.None;
 
@@ -239,8 +232,7 @@ namespace Porticle.Enumly
                         var sName = srcTypeOk ? ResolveEnumMemberName(srcLong, srcEnum) : null;
                         var tName = tgtTypeOk ? ResolveEnumMemberName(tgtLong, tgtEnum) : null;
 
-                        explicitMappings.Add(new ExplicitMapping(SourceName: sName, TargetName: tName, SourceTypeOk: srcTypeOk, TargetTypeOk: tgtTypeOk,
-                            SourceProvidedType: sArg.Type?.ToDisplayString() ?? "<unknown>", TargetProvidedType: tArg.Type?.ToDisplayString() ?? "<unknown>", Location: attrLoc));
+                        explicitMappings.Add(new ExplicitMapping(sName, tName, srcTypeOk, tgtTypeOk, sArg.Type?.ToDisplayString() ?? "<unknown>", tArg.Type?.ToDisplayString() ?? "<unknown>", attrLoc));
                         continue;
                     }
 
@@ -287,50 +279,46 @@ namespace Porticle.Enumly
                 var srcEnumFqn = srcEnum.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 var tgtEnumFqn = tgtEnum.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-                methods.Add(new MethodInfo(Name: m.Name, IsStatic: m.IsStatic, Accessibility: AccessibilityString(m.DeclaredAccessibility), ParamName: m.Parameters[0].Name,
-                    SourceEnumFqn: srcEnumFqn, TargetEnumFqn: tgtEnumFqn, SourceParamTypeFqn: srcEnumFqn + (srcNullable ? "?" : string.Empty),
-                    TargetReturnTypeFqn: tgtEnumFqn + (tgtNullable ? "?" : string.Empty), SourceDisplay: srcEnum.ToDisplayString(), TargetDisplay: tgtEnum.ToDisplayString(),
-                    SourceNullable: srcNullable, TargetNullable: tgtNullable, NullSourceMember: nullSourceMember, NullTargetMember: nullTargetMember,
-                    NullSourceSpecified: nullSourceRaw.Specified, NullTargetSpecified: nullTargetRaw.Specified, NullSourceTypeMatches: nullSourceTypeMatches,
-                    NullTargetTypeMatches: nullTargetTypeMatches, NullSourceProvidedType: nullSourceProvidedType, NullTargetProvidedType: nullTargetProvidedType,
-                    NullSourceRawDisplay: nullSourceRaw.Value?.ToString() ?? string.Empty, NullTargetRawDisplay: nullTargetRaw.Value?.ToString() ?? string.Empty,
-                    SourceMembers: srcMembers, TargetMembers: tgtMembers, ExplicitMappings: explicitMappings, IgnoreSourceValues: ignoreSource, IgnoreTargetValues: ignoreTarget,
-                    Location: location, Invalid: false));
+                methods.Add(new MethodInfo(m.Name, m.IsStatic, AccessibilityString(m.DeclaredAccessibility), m.Parameters[0].Name, srcEnumFqn, tgtEnumFqn, srcEnumFqn + (srcNullable ? "?" : string.Empty),
+                    tgtEnumFqn + (tgtNullable ? "?" : string.Empty), srcEnum.ToDisplayString(), tgtEnum.ToDisplayString(), srcNullable, tgtNullable, nullSourceMember, nullTargetMember, nullSourceRaw.Specified, nullTargetRaw.Specified,
+                    nullSourceTypeMatches, nullTargetTypeMatches, nullSourceProvidedType, nullTargetProvidedType, nullSourceRaw.Value?.ToString() ?? string.Empty, nullTargetRaw.Value?.ToString() ?? string.Empty, srcMembers, tgtMembers,
+                    explicitMappings, ignoreSource, ignoreTarget, location, false));
             }
 
             if (methods.Count == 0)
+            {
                 return null;
+            }
 
-            return new ClassInfo(Namespace: cls.ContainingNamespace.IsGlobalNamespace ? null : cls.ContainingNamespace.ToDisplayString(), ClassName: cls.Name,
-                IsStatic: cls.IsStatic, Accessibility: AccessibilityString(cls.DeclaredAccessibility), Methods: methods);
+            return new ClassInfo(cls.ContainingNamespace.IsGlobalNamespace ? null : cls.ContainingNamespace.ToDisplayString(), cls.Name, cls.IsStatic, AccessibilityString(cls.DeclaredAccessibility), methods);
         }
 
         private static INamedTypeSymbol? UnwrapEnum(ITypeSymbol type, out bool isNullable)
         {
             isNullable = false;
             if (type is not INamedTypeSymbol named)
+            {
                 return null;
+            }
 
-            if (named.IsGenericType
-                && named.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T
-                && named.TypeArguments.Length == 1
-                && named.TypeArguments[0] is INamedTypeSymbol inner
-                && inner.TypeKind == TypeKind.Enum)
+            if (named.IsGenericType && named.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T && named.TypeArguments.Length == 1 && named.TypeArguments[0] is INamedTypeSymbol inner && inner.TypeKind == TypeKind.Enum)
             {
                 isNullable = true;
                 return inner;
             }
 
             if (named.TypeKind == TypeKind.Enum)
+            {
                 return named;
+            }
 
             return null;
         }
 
         /// <summary>
-        /// Detects a common prefix shared by all members of an enum. The prefix is trimmed
-        /// back to the last Pascal-case boundary so that for every member the next character
-        /// after the prefix is uppercase. Returns "" when no useful prefix is found.
+        ///     Detects a common prefix shared by all members of an enum. The prefix is trimmed
+        ///     back to the last Pascal-case boundary so that for every member the next character
+        ///     after the prefix is uppercase. Returns "" when no useful prefix is found.
         /// </summary>
         private static string DetectCommonPrefix(string[] memberNames)
         {
@@ -354,26 +342,17 @@ namespace Porticle.Enumly
             {
                 var allUpper = true;
                 foreach (var n in memberNames)
-                {
                     if (cut >= n.Length || !char.IsUpper(n[cut]))
                     {
                         allUpper = false;
                         break;
                     }
-                }
 
                 if (allUpper) break;
                 cut--;
             }
 
             return cut > 0 ? lcp.Substring(0, cut) : string.Empty;
-        }
-
-        private readonly struct NamedArgInfo(bool specified, long? value, ITypeSymbol? type)
-        {
-            public bool Specified { get; } = specified;
-            public long? Value { get; } = value;
-            public ITypeSymbol? Type { get; } = type;
         }
 
         private static NamedArgInfo TryGetNamedArg(AttributeData attr, string name)
@@ -383,7 +362,10 @@ namespace Porticle.Enumly
                 if (pair.Key != name) continue;
                 var type = pair.Value.Type;
                 if (pair.Value.IsNull || pair.Value.Value is null)
+                {
                     return new NamedArgInfo(true, null, type);
+                }
+
                 try
                 {
                     return new NamedArgInfo(true, Convert.ToInt64(pair.Value.Value), type);
@@ -417,8 +399,9 @@ namespace Porticle.Enumly
             return null;
         }
 
-        private static string AccessibilityString(Accessibility a) =>
-            a switch
+        private static string AccessibilityString(Accessibility a)
+        {
+            return a switch
             {
                 Accessibility.Public => "public",
                 Accessibility.Internal => "internal",
@@ -426,8 +409,9 @@ namespace Porticle.Enumly
                 Accessibility.Protected => "protected",
                 Accessibility.ProtectedAndInternal => "private protected",
                 Accessibility.ProtectedOrInternal => "protected internal",
-                _ => "internal",
+                _ => "internal"
             };
+        }
 
         private static void Emit(SourceProductionContext spc, ClassInfo info)
         {
@@ -461,7 +445,9 @@ namespace Porticle.Enumly
                 // a null target that the signature can't produce). NullTargetValue without a nullable
                 // source is *not* an error — the directive is just unused, since the source can never be null.
                 if (m is { NullSourceSpecified: true, TargetNullable: false })
+                {
                     spc.ReportDiagnostic(Diagnostic.Create(NullSourceWithNonNullableTarget, m.Location, m.Name));
+                }
 
                 // Type checks: if a null-value was specified, its enum type must match the
                 // expected side. EM0005 takes precedence over EM0004 — a wrong-type value
@@ -490,9 +476,14 @@ namespace Porticle.Enumly
                 foreach (var em in m.ExplicitMappings)
                 {
                     if (!em.SourceTypeOk)
+                    {
                         spc.ReportDiagnostic(Diagnostic.Create(ExplicitMappingWrongType, em.Location, m.Name, "source", m.SourceDisplay, em.SourceProvidedType));
+                    }
+
                     if (!em.TargetTypeOk)
+                    {
                         spc.ReportDiagnostic(Diagnostic.Create(ExplicitMappingWrongType, em.Location, m.Name, "target", m.TargetDisplay, em.TargetProvidedType));
+                    }
 
                     if (em.SourceName is null || em.TargetName is null) continue;
 
@@ -540,7 +531,7 @@ namespace Porticle.Enumly
                 // e.g. Bar.BarRed matches Foo.Red.
                 var targetByMatch = new Dictionary<string, string>(StringComparer.Ordinal);
                 foreach (var t in m.TargetMembers) targetByMatch[t.MatchName] = t.Name;
-                var nullSrcMember = (m.TargetNullable ? m.NullSourceMember : null);
+                var nullSrcMember = m.TargetNullable ? m.NullSourceMember : null;
 
                 foreach (var s in m.SourceMembers)
                 {
@@ -567,7 +558,9 @@ namespace Porticle.Enumly
                     }
 
                     if (targetByMatch.TryGetValue(s.MatchName, out var byNameTgt))
+                    {
                         reachableTargets.Add(byNameTgt);
+                    }
                 }
 
                 if (m.NullTargetMember is not null) reachableTargets.Add(m.NullTargetMember);
@@ -584,8 +577,7 @@ namespace Porticle.Enumly
 
                 sb.Append("    ").Append(m.Accessibility).Append(' ');
                 if (m.IsStatic) sb.Append("static ");
-                sb.Append("partial ").Append(m.TargetReturnTypeFqn).Append(' ').Append(m.Name).Append('(').Append(m.SourceParamTypeFqn).Append(' ').Append(m.ParamName)
-                    .AppendLine(")");
+                sb.Append("partial ").Append(m.TargetReturnTypeFqn).Append(' ').Append(m.Name).Append('(').Append(m.SourceParamTypeFqn).Append(' ').Append(m.ParamName).AppendLine(")");
                 sb.AppendLine("    {");
                 sb.Append("        return ").Append(m.ParamName).AppendLine(" switch");
                 sb.AppendLine("        {");
@@ -622,26 +614,28 @@ namespace Porticle.Enumly
 
                     if (ignoredSourceNames.Contains(s.Name))
                     {
-                        sb.Append("            ").Append(m.SourceEnumFqn).Append('.').Append(s.Name)
-                            .Append(" => throw new global::System.ArgumentOutOfRangeException(nameof(").Append(m.ParamName).Append("), ").Append(m.ParamName)
-                            .Append(", \"The value '").Append(m.SourceDisplay).Append('.').Append(s.Name)
-                            .Append("' was excluded from the mapping by [EnumlyIgnoreSource].\"),").AppendLine();
+                        sb.Append("            ").Append(m.SourceEnumFqn).Append('.').Append(s.Name).Append(" => throw new global::System.ArgumentOutOfRangeException(nameof(").Append(m.ParamName).Append("), ").Append(m.ParamName)
+                            .Append(", \"The value '").Append(m.SourceDisplay).Append('.').Append(s.Name).Append("' was excluded from the mapping by [EnumlyIgnoreSource].\"),").AppendLine();
                         continue;
                     }
 
                     string? tgtName = null;
                     if (explicitMap.TryGetValue(s.Name, out var explicitTgt))
+                    {
                         tgtName = explicitTgt;
+                    }
                     else if (targetByMatch.TryGetValue(s.MatchName, out var byNameTgt))
+                    {
                         tgtName = byNameTgt;
+                    }
 
                     if (tgtName is null) continue;
 
                     sb.Append("            ").Append(m.SourceEnumFqn).Append('.').Append(s.Name).Append(" => ").Append(m.TargetEnumFqn).Append('.').Append(tgtName).AppendLine(",");
                 }
 
-                sb.Append("            _ => throw new global::System.ArgumentOutOfRangeException(nameof(").Append(m.ParamName).Append("), ").Append(m.ParamName)
-                    .Append(", $\"The value of enum \\\"").Append(m.SourceDisplay).Append("\\\" is not supported.\"),").AppendLine();
+                sb.Append("            _ => throw new global::System.ArgumentOutOfRangeException(nameof(").Append(m.ParamName).Append("), ").Append(m.ParamName).Append(", $\"The value of enum \\\"").Append(m.SourceDisplay)
+                    .Append("\\\" is not supported.\"),").AppendLine();
                 sb.AppendLine("        };");
                 sb.AppendLine("    }");
             }
@@ -650,6 +644,13 @@ namespace Porticle.Enumly
 
             var nsPrefix = info.Namespace?.Replace('.', '_') ?? "global";
             spc.AddSource($"{nsPrefix}.{info.ClassName}.EnumMapper.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
+        }
+
+        private readonly struct NamedArgInfo(bool specified, long? value, ITypeSymbol? type)
+        {
+            public bool Specified { get; } = specified;
+            public long? Value { get; } = value;
+            public ITypeSymbol? Type { get; } = type;
         }
 
         private sealed record ClassInfo(string? Namespace, string ClassName, bool IsStatic, string Accessibility, List<MethodInfo> Methods);
@@ -685,27 +686,18 @@ namespace Porticle.Enumly
             Location Location,
             bool Invalid)
         {
-            public static MethodInfo CreateInvalid(string name, Location location) =>
-                new(name, false, "internal", "value", "", "", "", "", "", "", false, false, null, null, false, false, true, true, "", "", "", "", Array.Empty<EnumMember>(),
-                    Array.Empty<EnumMember>(), Array.Empty<ExplicitMapping>(), Array.Empty<IgnoreValue>(), Array.Empty<IgnoreValue>(), location, true);
+            public static MethodInfo CreateInvalid(string name, Location location)
+            {
+                return new MethodInfo(name, false, "internal", "value", "", "", "", "", "", "", false, false, null, null, false, false, true, true, "", "", "", "", Array.Empty<EnumMember>(), Array.Empty<EnumMember>(),
+                    Array.Empty<ExplicitMapping>(), Array.Empty<IgnoreValue>(), Array.Empty<IgnoreValue>(), location, true);
+            }
         }
 
         private sealed record EnumMember(string Name, string MatchName);
 
-        private sealed record ExplicitMapping(
-            string? SourceName,
-            string? TargetName,
-            bool SourceTypeOk,
-            bool TargetTypeOk,
-            string SourceProvidedType,
-            string TargetProvidedType,
-            Location Location);
+        private sealed record ExplicitMapping(string? SourceName, string? TargetName, bool SourceTypeOk, bool TargetTypeOk, string SourceProvidedType, string TargetProvidedType, Location Location);
 
-        private sealed record IgnoreValue(
-            string? Name,
-            bool TypeOk,
-            string ProvidedType,
-            Location Location);
+        private sealed record IgnoreValue(string? Name, bool TypeOk, string ProvidedType, Location Location);
     }
 }
 
@@ -713,7 +705,9 @@ namespace Porticle.Enumly
 namespace System.Runtime.CompilerServices
 {
     /// <summary>
-    /// Needed to support the C# 9 init-only feature in older versions of C#
+    ///     Needed to support the C# 9 init-only feature in older versions of C#
     /// </summary>
-    internal static class IsExternalInit { }
+    internal static class IsExternalInit
+    {
+    }
 }
