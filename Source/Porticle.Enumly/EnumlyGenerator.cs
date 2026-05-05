@@ -79,33 +79,33 @@ namespace Porticle.Enumly
 
         private static readonly DiagnosticDescriptor MissingTargetMember = new("EM0001", "Source enum value has no matching target member",
             "Enum mapping '{0}' -> '{1}': source value '{2}' has no member with the same name in the target enum. Add [EnumlyMapValue({2}, <target>)] to map it explicitly, or [EnumlyIgnoreSource({2})] to exclude it from the mapping.",
-            "EnumMapper", DiagnosticSeverity.Error, true);
+            "Enumly", DiagnosticSeverity.Error, true);
 
         private static readonly DiagnosticDescriptor InvalidSignature = new("EM0002", "Invalid enum mapping method signature",
-            "Method '{0}' must be a partial method that takes exactly one (nullable) enum parameter and returns a (nullable) enum type. Example: public static partial TargetEnum Map(SourceEnum value).", "EnumMapper",
+            "Method '{0}' must be a partial method that takes exactly one (nullable) enum parameter and returns a (nullable) enum type. Example: public static partial TargetEnum Map(SourceEnum value).", "Enumly",
             DiagnosticSeverity.Error, true);
 
         private static readonly DiagnosticDescriptor NullSourceWithNonNullableTarget = new("EM0003", "NullSourceValue requires a nullable target",
-            "Method '{0}' specifies NullSourceValue but the return type is not a nullable enum. Either change the return type to '<TargetEnum>?' or remove NullSourceValue.", "EnumMapper", DiagnosticSeverity.Error, true);
+            "Method '{0}' specifies NullSourceValue but the return type is not a nullable enum. Either change the return type to '<TargetEnum>?' or remove NullSourceValue.", "Enumly", DiagnosticSeverity.Error, true);
 
-        private static readonly DiagnosticDescriptor InvalidNullValue = new("EM0004", "Invalid null value", "Method '{0}': value '{1}' is not a member of enum '{2}'. Use a declared member of '{2}'.", "EnumMapper", DiagnosticSeverity.Error,
+        private static readonly DiagnosticDescriptor InvalidNullValue = new("EM0004", "Invalid null value", "Method '{0}': value '{1}' is not a member of enum '{2}'. Use a declared member of '{2}'.", "Enumly", DiagnosticSeverity.Error,
             true);
 
-        private static readonly DiagnosticDescriptor NullValueWrongType = new("EM0005", "Null value has wrong type", "Method '{0}': {1} expects a value of enum '{2}' but got a value of type '{3}'. Use a member of '{2}'.", "EnumMapper",
+        private static readonly DiagnosticDescriptor NullValueWrongType = new("EM0005", "Null value has wrong type", "Method '{0}': {1} expects a value of enum '{2}' but got a value of type '{3}'. Use a member of '{2}'.", "Enumly",
             DiagnosticSeverity.Error, true);
 
         private static readonly DiagnosticDescriptor ExplicitMappingWrongType = new("EM0006", "Explicit mapping argument has wrong enum type",
-            "Method '{0}': EnumlyMapValue {1} expects a value of enum '{2}' but got a value of type '{3}'. The first argument must be a source-enum member, the second a target-enum member.", "EnumMapper", DiagnosticSeverity.Error, true);
+            "Method '{0}': EnumlyMapValue {1} expects a value of enum '{2}' but got a value of type '{3}'. The first argument must be a source-enum member, the second a target-enum member.", "Enumly", DiagnosticSeverity.Error, true);
 
         private static readonly DiagnosticDescriptor DuplicateExplicitMapping = new("EM0007", "Duplicate explicit mapping for source value",
-            "Method '{0}': source value '{1}' is mapped explicitly more than once. Remove the duplicate [EnumlyMapValue({1}, ...)] attribute.", "EnumMapper", DiagnosticSeverity.Error, true);
+            "Method '{0}': source value '{1}' is mapped explicitly more than once. Remove the duplicate [EnumlyMapValue({1}, ...)] attribute.", "Enumly", DiagnosticSeverity.Error, true);
 
         private static readonly DiagnosticDescriptor UnreachableTargetMember = new("EM0008", "Target enum value is not reachable from any source value",
             "Enum mapping '{0}' -> '{1}': target value '{2}' is not produced by any source value mapping. Add a source value that maps to '{2}' (by name, via [EnumlyMapValue], or via NullTargetValue), or add [EnumlyIgnoreTarget({2})] to mark it as intentionally unreachable.",
-            "EnumMapper", DiagnosticSeverity.Warning, true);
+            "Enumly", DiagnosticSeverity.Warning, true);
 
         private static readonly DiagnosticDescriptor IgnoreValueWrongType = new("EM0009", "Ignore-value attribute has wrong enum type",
-            "Method '{0}': [{1}] expects a value of enum '{2}' but got a value of type '{3}'. Use a member of '{2}'.", "EnumMapper", DiagnosticSeverity.Error, true);
+            "Method '{0}': [{1}] expects a value of enum '{2}' but got a value of type '{3}'. Use a member of '{2}'.", "Enumly", DiagnosticSeverity.Error, true);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
